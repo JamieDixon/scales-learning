@@ -1,0 +1,54 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+table td{ 
+  text-align: center;
+  border: 1px solid #ccc;
+  min-width: 2.6em;
+  min-height: 2.6em;
+}
+
+.note {
+  transition: all 1s;
+}
+
+.in-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 2.5em;
+  height: 2.5em;
+  border: 1px solid pink;
+}
+
+.dia {
+  border: 1px solid #6495ed;
+}
+
+.scale-notes {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scale-notes li {
+  min-width: 1em;
+  font-size: 3em;
+}
+
+.pent {
+  background: #6495ed;
+  color: white;
+}
+
+.root {
+  background: #FF6961;
+}
+
+.chord {
+  background: black;
+}
