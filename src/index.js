@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import ReactDOM from "react-dom";
-import { getNotesForKey } from './notes';
-import "./styles.css";
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
+import { getNotesForKey, generateIntervals } from './notes';
+import './styles.css';
 
 // Interval offsets fron ionian major mode
 const modes = {
@@ -22,8 +22,26 @@ const pentatonic = {
   aeolian: [1, 3, 4, 5, 7]
 };
 
+const intervalNames = {
+  '1': 'Tone',
+  '0.5': 'Semitone'
+};
+
 const intervals = [1, 1, 0.5, 1, 1, 1, 0.5];
-const notes = ['A', 'A#/B♭', 'B', 'B#/C', 'C#/D♭', 'D', 'D#/E♭', 'E', 'E#/F', 'F#/G♭', 'G', 'G#/A♭'];
+const notes = [
+  'A',
+  'A#/B♭',
+  'B',
+  'B#/C',
+  'C#/D♭',
+  'D',
+  'D#/E♭',
+  'E',
+  'E#/F',
+  'F#/G♭',
+  'G',
+  'G#/A♭'
+];
 
 const reverse = x => x.reverse();
 const id = x => x;
@@ -38,88 +56,122 @@ function App() {
 
   const handedFunc = isLeftHanded ? reverse : id;
 
-  const stringOpenNotes = reverse(['E', 'A', 'D', 'G', 'B', 'E']); // .reverse()
-  // const stringOpenNotes = ['D', 'A', 'D', 'G', 'A', 'D'].reverse();
+  const stringOpenNotes = reverse(['E', 'A', 'D', 'G', 'B', 'E']);
   const fretCount = 20;
 
   const mode = modes[modeName];
-  const notesInKey = getNotesForKey(keyNote, mode, intervals, notes);
+  const modedIntervals = generateIntervals(intervals, mode);
+  const notesInKey = getNotesForKey(keyNote, mode, modedIntervals, notes);
   const pentatonicNotes = pentatonic[modeName].map(n => notesInKey[n - 1]);
 
-  const triad = [notesInKey[0], notesInKey[2], notesInKey[4]];
-
-  const frets = handedFunc(Array(fretCount + 1).fill('').map((_, i) => i))// .reverse();
+  const frets = handedFunc(
+    Array(fretCount + 1)
+      .fill('')
+      .map((_, i) => i)
+  ); // .reverse();
 
   const strings = stringOpenNotes.map(st => {
     const index = notes.indexOf(st);
     const right = notes.slice(0, index);
     const left = notes.slice(index, notes.length);
 
-    let bar = [...left, ...right];
+    let orderedNotes = [...left, ...right];
 
-    bar = bar.length < fretCount + 1 ?
-    [...bar, ...bar.slice(0, fretCount + 1 - bar.length)]
-    : bar;
+    orderedNotes =
+      orderedNotes.length < fretCount + 1
+        ? [
+            ...orderedNotes,
+            ...orderedNotes.slice(0, fretCount + 1 - orderedNotes.length)
+          ]
+        : orderedNotes;
 
-    return handedFunc(bar);
+    return handedFunc(orderedNotes);
   });
-
-  let seenChordRoot = false;
 
   return (
     <div className="App">
       <table>
-      <tr>
-        {frets.map(f => (<th>{f}</th>))}
-      </tr>
-      {strings.map(n => <tr>{n.map(x => {
-        const foundInKey = notesInKey.find(note => {
-          return x.split('/').includes(note);
-        });
+        <thead>
+          <tr>
+            {frets.map(f => (
+              <th key={`top-nums-${f}`}>{f}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {strings.map((n, i) => (
+            <tr key={`string-${i}`}>
+              {n.map((x, i) => {
+                const reactKey = `string-${i}-note-${x}-${i}`;
+                const foundInKey = notesInKey.find(note => {
+                  return x.split('/').includes(note);
+                });
 
+                let hideNote = !foundInKey && notesToShow !== 'all';
 
-         let hideNote = !foundInKey && notesToShow !== 'all';
+                if (hideNote) {
+                  return <td key={reactKey} />;
+                }
 
+                const nextNote = foundInKey || x.split('/')[0];
 
-        if (hideNote) {
-          return <td></td>
-        }
+                const isPentNote = pentatonicNotes.includes(nextNote);
 
-        
+                hideNote = !isPentNote && notesToShow === 'pentatonic';
 
-        const nextNote = foundInKey || x.split('/')[0];
+                if (hideNote) {
+                  return <td key={reactKey} />;
+                }
 
-        const isPentNote = pentatonicNotes.includes(nextNote);
+                const isRootNote = nextNote === keyNote;
 
-        hideNote = !isPentNote && notesToShow === 'pentatonic';
-
-        if (hideNote) {
-          return <td></td>
-        }
-
-        const isRootNote = nextNote === keyNote;
-        const isChord = seenChordRoot && triad.includes(nextNote);
-
-        let className = foundInKey ? 'in-key note ' : 'note ';
-        className += foundInKey && !isPentNote ? 'dia ' : '';
-        className += isPentNote ? 'pent ' : '';
-        className += isRootNote ? 'root ' : '';
-        className += isChord ? 'chord ' : '';
-        return (<td><div className={className}>{nextNote}</div></td>)
-        })}</tr>)}
-        <tr>
-        {frets.map(f => (<th>{f}</th>))}
-      </tr>
+                let className = foundInKey ? 'in-key note ' : 'note ';
+                className += foundInKey && !isPentNote ? 'dia ' : '';
+                className += isPentNote ? 'pent ' : '';
+                className += isRootNote ? 'root ' : '';
+                return (
+                  <td key={reactKey}>
+                    <div className={className}>{nextNote}</div>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            {frets.map(f => (
+              <th key={`bottom-nums-${f}`}>{f}</th>
+            ))}
+          </tr>
+        </tfoot>
       </table>
-      
+
+      <ul className="interval-names">
+        {modedIntervals
+          .map(x => intervalNames[x])
+          .map(int => (
+            <li>{int}</li>
+          ))}
+      </ul>
+
       <div>
         <label htmlFor="handed">Left handed?</label>
-        <input type="checkbox" id="handed" checked={isLeftHanded} onChange={e => setIsLeftHanded(e.target.checked)} />
+        <input
+          type="checkbox"
+          id="handed"
+          checked={isLeftHanded}
+          onChange={e => setIsLeftHanded(e.target.checked)}
+        />
       </div>
 
       <div>
         <label htmlFor="which-key">Which key would you like to use?</label>
-        <select id="which-key" value={keyNote} onChange={e => setKeyNote(e.target.value)}>
+        <select
+          id="which-key"
+          value={keyNote}
+          onChange={e => setKeyNote(e.target.value)}
+        >
           <option>A</option>
           <option>A#</option>
           <option>B</option>
@@ -137,19 +189,27 @@ function App() {
 
       <div>
         <label htmlFor="which-mode">Which mode would you like to use?</label>
-        <select id="which-mode" value={modeName} onChange={e => setModeName(e.target.value)}>
+        <select
+          id="which-mode"
+          value={modeName}
+          onChange={e => setModeName(e.target.value)}
+        >
           <option value="ionian">Ionian (Major)</option>
           <option value="dorian">Dorian</option>
           <option value="phrygian">Phrygian</option>
           <option value="lydian">Lydian</option>
           <option value="mixolydian">Mixolydian</option>
-          <option value="aeolian">Aeolian (Minor)</option>
+          <option value="aeolian">Aeolian (Natural Minor)</option>
         </select>
       </div>
-      
+
       <div>
         <label htmlFor="which-notes">Which notes do you want to see?</label>
-        <select id="which-notes" value={notesToShow} onChange={e => setNotesToShow(e.target.value)}>
+        <select
+          id="which-notes"
+          value={notesToShow}
+          onChange={e => setNotesToShow(e.target.value)}
+        >
           <option value="all">All</option>
           <option value="diatonic">Diatonic</option>
           <option value="pentatonic">Pentatonic</option>
@@ -158,16 +218,20 @@ function App() {
 
       <p>Notes in this key</p>
       <ul className="scale-notes">
-        {notesInKey.map(n => <li>{n}</li>)}
+        {notesInKey.map(n => (
+          <li key={`dia-notes-${n}`}>{n}</li>
+        ))}
       </ul>
 
       <p>Pentatonic notes in this key</p>
       <ul className="scale-notes">
-        {pentatonicNotes.map(n => <li>{n}</li>)}
+        {pentatonicNotes.map(n => (
+          <li key={`pent-notes-${n}`}>{n}</li>
+        ))}
       </ul>
     </div>
   );
 }
 
-const rootElement = document.getElementById("root");
+const rootElement = document.getElementById('root');
 ReactDOM.render(<App />, rootElement);
