@@ -2,9 +2,11 @@ let context = null;
 let vco = null;
 let vca = null;
 
+const WorkingAudioConext = window.AudioContext || window.webkitAudioContext;
+
 const createAudio = () => {
   if (!context) {
-    context = new AudioContext();
+    context = new WorkingAudioConext();
 
     // voltage controlled oscillator
     vco = context.createOscillator();
