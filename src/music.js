@@ -1,16 +1,27 @@
-const context = new AudioContext();
-// voltage controlled oscillator
-const vco = context.createOscillator();
-vco.type = vco.SINE;
-vco.frequency.value = 200;
-vco.start(0);
+let context = null;
+let vco = null;
+let vca = null;
 
-// voltage controlled amplifier
-const vca = context.createGain();
-vca.gain.setValueAtTime(0, context.currentTime);
+const createAudio = () => {
+  if (!context) {
+    context = new AudioContext();
 
-vco.connect(vca);
-vca.connect(context.destination);
+    // voltage controlled oscillator
+    vco = context.createOscillator();
+    vco.type = vco.SINE;
+    vco.frequency.value = 200;
+    vco.start(0);
+
+    // voltage controlled amplifier
+    vca = context.createGain();
+    vca.gain.setValueAtTime(0, context.currentTime);
+
+    vco.connect(vca);
+    vca.connect(context.destination);
+  }
+
+  return [vco, vca];
+};
 
 var getFrequencyOfNote = function(notes, note) {
   const octave = note.length === 3 ? note.charAt(2) : note.charAt(1);
@@ -29,6 +40,7 @@ var getFrequencyOfNote = function(notes, note) {
 
 export const playNote = (notes, note) => {
   const frequency = getFrequencyOfNote(notes, note);
+  const [vco, vca] = createAudio();
   vco.frequency.value = frequency;
   vca.gain.linearRampToValueAtTime(0.1, context.currentTime + 0.1);
 
