@@ -110,6 +110,8 @@ function App() {
           if (note === b) {
             return b;
           }
+
+          return null;
         });
 
         return `${noteInKey || n}${octave}`;
