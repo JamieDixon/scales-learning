@@ -5,6 +5,10 @@ let vca = null;
 const WorkingAudioConext = window.AudioContext || window.webkitAudioContext;
 
 const createAudio = () => {
+  if (context && context.state === 'suspended' && 'ontouchstart' in window) {
+    context.resume();
+  }
+
   if (!context) {
     context = new WorkingAudioConext();
 
