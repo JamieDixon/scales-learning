@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { getNotesForKey, generateIntervals } from './notes';
+import { playNote } from './music';
 import './styles.css';
 
 // Interval offsets fron ionian major mode
@@ -46,18 +47,24 @@ const notes = [
 const reverse = x => x.reverse();
 const id = x => x;
 
+const getNaturalOrSharp = notes => {
+  const [natural] = notes.filter(x => !x.includes('#') && !x.includes('♭'));
+  const [sharp] = notes.filter(x => x.includes('#'));
+  return natural || sharp;
+};
+
 function App() {
   // all || diatonic || pentatonic
   const [notesToShow, setNotesToShow] = useState('all');
   const [modeName, setModeName] = useState('ionian');
   const [keyNote, setKeyNote] = useState('C');
   const [isLeftHanded, setIsLeftHanded] = useState(true);
-  const [chordPosition, setChordPosition] = useState(1);
+  const [showOctaveNumbers, setShowOctaveNumbers] = useState(true);
 
   const handedFunc = isLeftHanded ? reverse : id;
 
-  const stringOpenNotes = reverse(['E', 'A', 'D', 'G', 'B', 'E']);
-  const fretCount = 20;
+  const stringOpenNotes = reverse(['E2', 'A2', 'D3', 'G3', 'B3', 'E4']);
+  const fretCount = 27;
 
   const mode = modes[modeName];
   const modedIntervals = generateIntervals(intervals, mode);
@@ -68,25 +75,49 @@ function App() {
     Array(fretCount + 1)
       .fill('')
       .map((_, i) => i)
-  ); // .reverse();
+  );
 
-  const strings = stringOpenNotes.map(st => {
-    const index = notes.indexOf(st);
-    const right = notes.slice(0, index);
-    const left = notes.slice(index, notes.length);
+  const strings = handedFunc(
+    handedFunc(stringOpenNotes).map(st => {
+      const startingOctave = parseInt(st[st.length - 1], 10);
+      const note = st.slice(0, st.length - 1);
+      const index = notes.indexOf(note);
+      const right = notes.slice(0, index);
+      const left = notes.slice(index, notes.length);
 
-    let orderedNotes = [...left, ...right];
+      let orderedNotes = [...left, ...right];
 
-    orderedNotes =
-      orderedNotes.length < fretCount + 1
-        ? [
-            ...orderedNotes,
-            ...orderedNotes.slice(0, fretCount + 1 - orderedNotes.length)
-          ]
-        : orderedNotes;
+      while (orderedNotes.length < fretCount + 1) {
+        orderedNotes = [
+          ...orderedNotes,
+          ...orderedNotes.slice(0, fretCount + 1 - orderedNotes.length)
+        ];
+      }
 
-    return handedFunc(orderedNotes);
-  });
+      let octave = startingOctave;
+      orderedNotes = orderedNotes.map(n => {
+        if (n === 'B#/C') {
+          octave += 1;
+        }
+
+        const noteInKey = notesInKey.find(note => {
+          const [a, b] = n.split('/');
+
+          if (note === a) {
+            return a;
+          }
+
+          if (note === b) {
+            return b;
+          }
+        });
+
+        return `${noteInKey || n}${octave}`;
+      });
+
+      return handedFunc(orderedNotes);
+    })
+  );
 
   return (
     <div className="App">
@@ -102,10 +133,13 @@ function App() {
           {strings.map((n, i) => (
             <tr key={`string-${i}`}>
               {n.map((x, i) => {
-                const reactKey = `string-${i}-note-${x}-${i}`;
-                const foundInKey = notesInKey.find(note => {
-                  return x.split('/').includes(note);
-                });
+                const octave = x[x.length - 1];
+                const reactKey = `string-${i}-note-${x}-${octave}`;
+                const noteOptions = x.slice(0, x.length - 1);
+
+                const foundInKey = !!notesInKey.find(note =>
+                  noteOptions.split('/').includes(note)
+                );
 
                 let hideNote = !foundInKey && notesToShow !== 'all';
 
@@ -113,9 +147,15 @@ function App() {
                   return <td key={reactKey} />;
                 }
 
-                const nextNote = foundInKey || x.split('/')[0];
+                let nextNote = noteOptions;
 
-                const isPentNote = pentatonicNotes.includes(nextNote);
+                if (!foundInKey) {
+                  nextNote = getNaturalOrSharp(noteOptions.split('/'));
+                }
+
+                const isPentNote = !!pentatonicNotes.find(note =>
+                  noteOptions.split('/').includes(note)
+                );
 
                 hideNote = !isPentNote && notesToShow === 'pentatonic';
 
@@ -123,15 +163,23 @@ function App() {
                   return <td key={reactKey} />;
                 }
 
-                const isRootNote = nextNote === keyNote;
+                const isRootNote = noteOptions.split('/').includes(keyNote);
 
                 let className = foundInKey ? 'in-key note ' : 'note ';
                 className += foundInKey && !isPentNote ? 'dia ' : '';
                 className += isPentNote ? 'pent ' : '';
                 className += isRootNote ? 'root ' : '';
                 return (
-                  <td key={reactKey}>
-                    <div className={className}>{nextNote}</div>
+                  <td
+                    key={reactKey}
+                    onClick={() => {
+                      playNote(notes, nextNote + octave);
+                    }}
+                  >
+                    <div className={className}>
+                      {nextNote}
+                      {showOctaveNumbers ? octave : ''}
+                    </div>
                   </td>
                 );
               })}
@@ -162,6 +210,16 @@ function App() {
           id="handed"
           checked={isLeftHanded}
           onChange={e => setIsLeftHanded(e.target.checked)}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="handed">Show octave numbers?</label>
+        <input
+          type="checkbox"
+          id="handed"
+          checked={showOctaveNumbers}
+          onChange={e => setShowOctaveNumbers(e.target.checked)}
         />
       </div>
 
