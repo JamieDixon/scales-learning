@@ -2,15 +2,15 @@ let context = null;
 let vco = null;
 let vca = null;
 
-const WorkingAudioConext = window.AudioContext || window.webkitAudioContext;
+const WorkingAudioContext = window.AudioContext || window.webkitAudioContext;
 
 const createAudio = () => {
-  if (context && context.state === 'suspended' && 'ontouchstart' in window) {
-    context.resume();
-  }
-
   if (!context) {
-    context = new WorkingAudioConext();
+    context = new WorkingAudioContext();
+
+    if (context.state === 'suspended' && 'ontouchstart' in window) {
+      context.resume();
+    }
 
     // voltage controlled oscillator
     vco = context.createOscillator();
@@ -48,9 +48,9 @@ export const playNote = (notes, note) => {
   const frequency = getFrequencyOfNote(notes, note);
   const [vco, vca] = createAudio();
   vco.frequency.value = frequency;
-  vca.gain.linearRampToValueAtTime(0.1, context.currentTime + 0.1);
+  vca.gain.linearRampToValueAtTime(1.0, context.currentTime + 0.01);
 
   setTimeout(() => {
-    vca.gain.linearRampToValueAtTime(0.0, context.currentTime + 0.1);
+    vca.gain.linearRampToValueAtTime(0.0, context.currentTime + 0.01);
   }, 300);
 };
