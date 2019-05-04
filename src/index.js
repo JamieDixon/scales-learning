@@ -209,6 +209,7 @@ function App() {
                   </td>
                 );
               })}
+							<th>{i + 1}</th>
             </tr>
           ))}
         </tbody>
