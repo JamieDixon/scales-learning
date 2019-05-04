@@ -23,6 +23,25 @@ const pentatonic = {
   aeolian: [1, 3, 4, 5, 7]
 };
 
+const openNotes = {
+  eadgbe: {
+    notes: ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'],
+    label: 'Guitar (Standard Tuning)'
+  },
+  dadgbe: {
+    notes: ['D2', 'A2', 'D3', 'G3', 'B3', 'E4'],
+    label: 'Guitar (Drop D Tuning)'
+  },
+  dadgad: {
+    notes: ['D2', 'A2', 'D3', 'G3', 'A3', 'D4'],
+    label: 'Guitar (DADGAD Tuning)'
+  },
+  bass: {
+    notes: ['E1', 'A1', 'D2', 'G2'],
+    label: 'Bass Guitar (Standard Tuning)'
+  }
+};
+
 const intervalNames = {
   '1': 'Tone',
   '0.5': 'Semitone'
@@ -60,10 +79,15 @@ function App() {
   const [keyNote, setKeyNote] = useState('C');
   const [isLeftHanded, setIsLeftHanded] = useState(true);
   const [showOctaveNumbers, setShowOctaveNumbers] = useState(true);
+  const [instrument, setInstrument] = useState({
+    key: 'eadgbe',
+    ...openNotes.eadgbe
+  });
 
   const handedFunc = isLeftHanded ? reverse : id;
 
-  const stringOpenNotes = reverse(['E2', 'A2', 'D3', 'G3', 'B3', 'E4']);
+  const stringOpenNotes = reverse(instrument.notes);
+
   const fretCount = 27;
 
   const mode = modes[modeName];
@@ -223,6 +247,24 @@ function App() {
           checked={showOctaveNumbers}
           onChange={e => setShowOctaveNumbers(e.target.checked)}
         />
+      </div>
+
+      <div>
+        <label htmlFor="instrument">Instrument:</label>
+        <select
+          id="instrument"
+          value={instrument.key}
+          onChange={e =>
+            setInstrument({
+              key: e.target.value,
+              ...openNotes[e.target.value]
+            })
+          }
+        >
+          {Object.entries(openNotes).map(([key, value]) => (
+            <option value={key}>{value.label}</option>
+          ))}
+        </select>
       </div>
 
       <div>
