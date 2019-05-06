@@ -14,7 +14,7 @@ const createAudio = () => {
 
     // voltage controlled oscillator
     vco = context.createOscillator();
-    vco.type = vco.SINE;
+    vco.type = 'triangle';
     vco.frequency.value = 200;
     vco.start(0);
 
