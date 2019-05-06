@@ -86,7 +86,7 @@ function App() {
 
   const handedFunc = isLeftHanded ? reverse : id;
 
-  const stringOpenNotes = reverse(instrument.notes);
+  const stringOpenNotes = instrument.notes
 
   const fretCount = 27;
 
@@ -101,8 +101,8 @@ function App() {
       .map((_, i) => i)
   );
 
-  const strings = handedFunc(
-    handedFunc(stringOpenNotes).map(st => {
+  const strings = reverse(
+   stringOpenNotes.map(st => {
       const startingOctave = parseInt(st[st.length - 1], 10);
       const note = st.slice(0, st.length - 1);
       const index = notes.indexOf(note);
