@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { getNotesForKey, generateIntervals } from './notes';
 import { playNote } from './music';
+import Switch from 'react-switch';
+import Select from 'react-select';
 import './styles.css';
 
 // Interval offsets fron ionian major mode
@@ -72,10 +74,32 @@ const getNaturalOrSharp = notes => {
   return natural || sharp;
 };
 
+const Switcher = ({ onChange, checked }) => (
+  <Switch
+    checked={checked}
+    onChange={onChange}
+    onColor="#86d3ff"
+    onHandleColor="#2693e6"
+    handleDiameter={30}
+    uncheckedIcon={false}
+    checkedIcon={false}
+    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+    height={20}
+    width={48}
+  />
+);
+
 function App() {
   // all || diatonic || pentatonic
-  const [notesToShow, setNotesToShow] = useState('all');
-  const [modeName, setModeName] = useState('ionian');
+  const [notesToShow, setNotesToShow] = useState({
+    value: 'pentatonic',
+    label: 'Pentatonic'
+  });
+  const [modeName, setModeName] = useState({
+    value: 'ionian',
+    label: 'Ionian (Major)'
+  });
   const [keyNote, setKeyNote] = useState('C');
   const [isLeftHanded, setIsLeftHanded] = useState(true);
   const [showOctaveNumbers, setShowOctaveNumbers] = useState(true);
@@ -86,14 +110,16 @@ function App() {
 
   const handedFunc = isLeftHanded ? reverse : id;
 
-  const stringOpenNotes = instrument.notes
+  const stringOpenNotes = instrument.notes;
 
   const fretCount = 27;
 
-  const mode = modes[modeName];
+  const mode = modes[modeName.value];
   const modedIntervals = generateIntervals(intervals, mode);
   const notesInKey = getNotesForKey(keyNote, mode, modedIntervals, notes);
-  const pentatonicNotes = pentatonic[modeName].map(n => notesInKey[n - 1]);
+  const pentatonicNotes = pentatonic[modeName.value].map(
+    n => notesInKey[n - 1]
+  );
 
   const frets = handedFunc(
     Array(fretCount + 1)
@@ -102,7 +128,7 @@ function App() {
   );
 
   const strings = reverse(
-   stringOpenNotes.map(st => {
+    stringOpenNotes.map(st => {
       const startingOctave = parseInt(st[st.length - 1], 10);
       const note = st.slice(0, st.length - 1);
       const index = notes.indexOf(note);
@@ -167,11 +193,7 @@ function App() {
                   noteOptions.split('/').includes(note)
                 );
 
-                let hideNote = !foundInKey && notesToShow !== 'all';
-
-                if (hideNote) {
-                  return <td key={reactKey} />;
-                }
+                let hideNote = !foundInKey && notesToShow.value !== 'all';
 
                 let nextNote = noteOptions;
 
@@ -183,10 +205,19 @@ function App() {
                   noteOptions.split('/').includes(note)
                 );
 
-                hideNote = !isPentNote && notesToShow === 'pentatonic';
+                hideNote =
+                  hideNote ||
+                  (!isPentNote && notesToShow.value === 'pentatonic');
 
                 if (hideNote) {
-                  return <td key={reactKey} />;
+                  return (
+                    <td className="hidden-note" key={reactKey}>
+                      <div className="note">
+                        {nextNote}
+                        {showOctaveNumbers ? octave : ''}
+                      </div>
+                    </td>
+                  );
                 }
 
                 const isRootNote = noteOptions.split('/').includes(keyNote);
@@ -209,7 +240,7 @@ function App() {
                   </td>
                 );
               })}
-							<th>{i + 1}</th>
+              <th class="string-number">{i + 1}</th>
             </tr>
           ))}
         </tbody>
@@ -229,96 +260,85 @@ function App() {
             <li>{int}</li>
           ))}
       </ul>
+      <div class="options">
+        <div>
+          <label htmlFor="instrument">Instrument:</label>
+          <Select
+            value={{ value: instrument.key, label: instrument.label }}
+            options={Object.entries(openNotes).reduce(
+              (agg, [value, item]) => [...agg, { value, label: item.label }],
+              []
+            )}
+            onChange={({ value }) =>
+              setInstrument({ key: value, ...openNotes[value] })
+            }
+          />
+        </div>
 
-      <div>
-        <label htmlFor="handed">Left handed?</label>
-        <input
-          type="checkbox"
-          id="handed"
-          checked={isLeftHanded}
-          onChange={e => setIsLeftHanded(e.target.checked)}
-        />
+        <div>
+          <label htmlFor="which-key">Which key would you like to use?</label>
+          <Select
+            value={{ value: keyNote, label: keyNote }}
+            options={[
+              'A',
+              'A#',
+              'B',
+              'C',
+              'C#',
+              'D',
+              'D#',
+              'E',
+              'F',
+              'F#',
+              'G',
+              'G#'
+            ].map(x => ({ value: x, label: x }))}
+            onChange={e => setKeyNote(e.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="which-mode">Which mode would you like to use?</label>{' '}
+          <Select
+            id="which-mode"
+            value={modeName}
+            options={[
+              { value: 'ionian', label: 'Ionian (Major)' },
+              { value: 'dorian', label: 'Dorian' },
+              { value: 'phrygian', label: 'Phrygian' },
+              { value: 'lydian', label: 'Lydian' },
+              { value: 'mixolydian', label: 'Mixolydian' },
+              { value: 'aeolian', label: 'Aeolian (Natural Minor)' }
+            ]}
+            onChange={setModeName}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="which-notes">Which notes do you want to see?</label>
+          <Select
+            value={notesToShow}
+            options={[
+              { value: 'all', label: 'All' },
+              { value: 'diatonic', label: 'Diatonic' },
+              { value: 'pentatonic', label: 'Pentatonic' }
+            ]}
+            onChange={setNotesToShow}
+          />
+        </div>
+
+        <div class="inline">
+          <label htmlFor="handed">Left handed:</label>
+          <Switcher checked={isLeftHanded} onChange={setIsLeftHanded} />
+        </div>
+
+        <div class="inline">
+          <label htmlFor="handed">Octave numbers:</label>
+          <Switcher
+            checked={showOctaveNumbers}
+            onChange={setShowOctaveNumbers}
+          />
+        </div>
       </div>
-
-      <div>
-        <label htmlFor="handed">Show octave numbers?</label>
-        <input
-          type="checkbox"
-          id="handed"
-          checked={showOctaveNumbers}
-          onChange={e => setShowOctaveNumbers(e.target.checked)}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="instrument">Instrument:</label>
-        <select
-          id="instrument"
-          value={instrument.key}
-          onChange={e =>
-            setInstrument({
-              key: e.target.value,
-              ...openNotes[e.target.value]
-            })
-          }
-        >
-          {Object.entries(openNotes).map(([key, value]) => (
-            <option value={key}>{value.label}</option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="which-key">Which key would you like to use?</label>
-        <select
-          id="which-key"
-          value={keyNote}
-          onChange={e => setKeyNote(e.target.value)}
-        >
-          <option>A</option>
-          <option>A#</option>
-          <option>B</option>
-          <option>C</option>
-          <option>C#</option>
-          <option>D</option>
-          <option>D#</option>
-          <option>E</option>
-          <option>F</option>
-          <option>F#</option>
-          <option>G</option>
-          <option>G#</option>
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="which-mode">Which mode would you like to use?</label>
-        <select
-          id="which-mode"
-          value={modeName}
-          onChange={e => setModeName(e.target.value)}
-        >
-          <option value="ionian">Ionian (Major)</option>
-          <option value="dorian">Dorian</option>
-          <option value="phrygian">Phrygian</option>
-          <option value="lydian">Lydian</option>
-          <option value="mixolydian">Mixolydian</option>
-          <option value="aeolian">Aeolian (Natural Minor)</option>
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="which-notes">Which notes do you want to see?</label>
-        <select
-          id="which-notes"
-          value={notesToShow}
-          onChange={e => setNotesToShow(e.target.value)}
-        >
-          <option value="all">All</option>
-          <option value="diatonic">Diatonic</option>
-          <option value="pentatonic">Pentatonic</option>
-        </select>
-      </div>
-
       <p>Notes in this key</p>
       <ul className="scale-notes">
         {notesInKey.map(n => (
