@@ -112,7 +112,7 @@ function App() {
 
   const stringOpenNotes = instrument.notes;
 
-  const fretCount = 27;
+  const [fretCount, setFretCount] = useState({ value: 15, label: 15 });
 
   const mode = modes[modeName.value];
   const modedIntervals = generateIntervals(intervals, mode);
@@ -122,7 +122,7 @@ function App() {
   );
 
   const frets = handedFunc(
-    Array(fretCount + 1)
+    Array(fretCount.value + 1)
       .fill('')
       .map((_, i) => i)
   );
@@ -137,10 +137,10 @@ function App() {
 
       let orderedNotes = [...left, ...right];
 
-      while (orderedNotes.length < fretCount + 1) {
+      while (orderedNotes.length < fretCount.value + 1) {
         orderedNotes = [
           ...orderedNotes,
-          ...orderedNotes.slice(0, fretCount + 1 - orderedNotes.length)
+          ...orderedNotes.slice(0, fretCount.value + 1 - orderedNotes.length)
         ];
       }
 
@@ -326,6 +326,18 @@ function App() {
           />
         </div>
 
+        <div>
+          <label htmlFor="fretcount">Fret count</label>
+          <Select
+            value={fretCount}
+            options={[
+              { value: 12, label: 12 },
+              { value: 15, label: 15 },
+              { value: 27, label: 27 }
+            ]}
+						onChange={setFretCount}
+          />
+        </div>
         <div class="inline">
           <label htmlFor="handed">Left handed:</label>
           <Switcher checked={isLeftHanded} onChange={setIsLeftHanded} />
