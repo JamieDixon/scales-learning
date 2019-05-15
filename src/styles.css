@@ -9,7 +9,7 @@ table {
 table td {
   position: relative;
   text-align: center;
-  border-left: 2px solid #ccc;
+  border-left: 4px solid #ccc;
   min-width: 3em;
   min-height: 3em;
   margin: 0;
@@ -18,7 +18,7 @@ table td {
 table td::before {
   position: absolute;
   content: '';
-  border: 1px solid #ccc;
+  border: 1px solid #FFD700; 
   width: 100%;
   left: 0;
   top: 50%;
@@ -110,7 +110,7 @@ tfoot tr th {
 .options {
   display: flex;
   flex-wrap: wrap;
-  width: 50%;
+  width: 40%;
   text-align: left;
   margin-top: 2em;
   padding: 1em;
