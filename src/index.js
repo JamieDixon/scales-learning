@@ -112,7 +112,7 @@ function App() {
 
   const stringOpenNotes = instrument.notes;
 
-  const [fretCount, setFretCount] = useState({ value: 15, label: 15 });
+  const [fretCount, setFretCount] = useState({ value: 27, label: 27 });
 
   const mode = modes[modeName.value];
   const modedIntervals = generateIntervals(intervals, mode);
@@ -253,13 +253,6 @@ function App() {
         </tfoot>
       </table>
 
-      <ul className="interval-names">
-        {modedIntervals
-          .map(x => intervalNames[x])
-          .map(int => (
-            <li>{int}</li>
-          ))}
-      </ul>
       <div class="options">
         <div>
           <label htmlFor="instrument">Instrument:</label>
@@ -335,7 +328,7 @@ function App() {
               { value: 15, label: 15 },
               { value: 27, label: 27 }
             ]}
-						onChange={setFretCount}
+            onChange={setFretCount}
           />
         </div>
         <div class="inline">
@@ -351,19 +344,38 @@ function App() {
           />
         </div>
       </div>
-      <p>Notes in this key</p>
-      <ul className="scale-notes">
-        {notesInKey.map(n => (
-          <li key={`dia-notes-${n}`}>{n}</li>
-        ))}
-      </ul>
 
-      <p>Pentatonic notes in this key</p>
-      <ul className="scale-notes">
-        {pentatonicNotes.map(n => (
-          <li key={`pent-notes-${n}`}>{n}</li>
-        ))}
-      </ul>
+      <div class="info">
+			<p>Intervals of {modeName.label}</p>
+        <ul className="interval-names">
+          {modedIntervals
+            .map(x => intervalNames[x])
+            .map(int => (
+              <li>{int}</li>
+            ))}
+        </ul>
+        <p>
+          Diatonic notes in {keyNote} {modeName.label}
+        </p>
+        <ul className="scale-notes">
+          {notesInKey.map(n => (
+            <li className="list-note" key={`dia-notes-${n}`}>
+              {n}
+            </li>
+          ))}
+        </ul>
+
+        <p>
+          Pentatonic notes in {keyNote} {modeName.label}
+        </p>
+        <ul className="scale-notes">
+          {pentatonicNotes.map(n => (
+            <li className="list-note" key={`pent-notes-${n}`}>
+              {n}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

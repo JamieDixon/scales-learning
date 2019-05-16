@@ -1,6 +1,7 @@
 .App {
   font-family: sans-serif;
   text-align: center;
+  color: #666;
 }
 
 table {
@@ -18,26 +19,26 @@ table td {
 table td::before {
   position: absolute;
   content: '';
-  border: 1px solid #FFD700; 
+  border: 1px solid #ffd700;
   width: 100%;
   left: 0;
   top: 50%;
-	z-index: -1;
+  z-index: -1;
 }
 
 table tr th {
-	color: #999;
+  color: #999;
 }
 
 table tr th.string-number {
-	padding-left: 1em;
-	border-left: 2px solid #ccc;
+  padding-left: 1em;
+  border-left: 2px solid #ccc;
 }
 
 thead tr th,
 tfoot tr th {
   padding-bottom: 0.5em;
-  padding-top: 0.5em; 
+  padding-top: 0.5em;
 }
 
 .note {
@@ -45,12 +46,12 @@ tfoot tr th {
   cursor: pointer;
   color: #999;
   margin: 0.2em;
-	background: #fff;
-	font-size: 0.8em;
+  background: #fff;
+  font-size: 0.8em;
 }
 
 .in-key {
-	font-size: 1em;
+  font-size: 1em;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +62,7 @@ tfoot tr th {
 }
 
 .dia {
-	background: #fff;
+  background: #fff;
   border: 1px solid #6495ed;
 }
 
@@ -89,7 +90,7 @@ tfoot tr th {
 
 .hidden-note .note {
   opacity: 0;
-	cursor: default;
+  cursor: default;
 }
 
 .chord {
@@ -105,17 +106,22 @@ tfoot tr th {
 
 .interval-names li {
   margin-right: 1em;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 1em;
 }
 
 .options {
   display: flex;
   flex-wrap: wrap;
+  float: left;
   width: 40%;
   text-align: left;
   margin-top: 2em;
   padding: 1em;
   border: 1px solid #ccc;
-	border-radius: 3px;
+  border-radius: 3px;
 }
 
 .options label {
@@ -138,4 +144,21 @@ tfoot tr th {
   margin: 0;
   margin-right: 0.5em;
   padding-top: 0.3em;
+}
+
+.info {
+  float: left;
+  text-align: left;
+  margin-left: 1em;
+}
+
+.info .list-note {
+  border: 1px solid #ccc;
+  text-align: center;
+  margin-right: 0.3em;
+  border-radius: 20px;
+  padding: 0.3em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
