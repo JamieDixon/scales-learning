@@ -109,6 +109,8 @@ function App() {
   });
   const [highlightMode, setHighlightMode] = useState(false);
   const [highlightNotes, setHighlightNotes] = useState([]);
+  const [highlightFrets, setHighlightFrets] = useState([]);
+
   const handedFunc = isLeftHanded ? reverse : id;
 
   const stringOpenNotes = instrument.notes;
@@ -190,6 +192,14 @@ function App() {
                 const reactKey = `string-${i}-note-${x}-${octave}`;
                 const noteOptions = x.slice(0, x.length - 1);
 
+                const highlightFretNumber = isLeftHanded
+                  ? fretCount.value - j
+                  : j;
+
+                const tdClass = highlightFrets.includes(highlightFretNumber)
+                  ? 'hi-fret '
+                  : '';
+
                 const foundInKey = !!notesInKey.find(note =>
                   noteOptions.split('/').includes(note)
                 );
@@ -212,7 +222,7 @@ function App() {
 
                 if (hideNote) {
                   return (
-                    <td className="hidden-note" key={reactKey}>
+                    <td className={tdClass + 'hidden-note'} key={reactKey}>
                       <div className="note">
                         {nextNote}
                         {showOctaveNumbers ? octave : ''}
@@ -232,9 +242,11 @@ function App() {
                 className += isPentNote ? 'pent ' : '';
                 className += isRootNote ? 'root ' : '';
                 className += isHighlighted ? 'highlight ' : '';
-								className += highlightMode ? 'hi-mode ' : '';
+                className += highlightMode ? 'hi-mode ' : '';
+
                 return (
                   <td
+                    className={tdClass}
                     key={reactKey}
                     onClick={() => {
                       playNote(notes, nextNote + octave);
@@ -276,7 +288,26 @@ function App() {
         <tfoot>
           <tr>
             {frets.map(f => (
-              <th key={`bottom-nums-${f}`}>{f}</th>
+              <th
+                className="fret-number"
+                key={`bottom-nums-${f}`}
+                onClick={() => {
+                  if (highlightFrets.includes(f)) {
+                    const index = highlightFrets.indexOf(f);
+
+                    const next = [
+                      ...highlightFrets.slice(0, index),
+                      ...highlightFrets.slice(index + 1, highlightFrets.length)
+                    ];
+
+                    setHighlightFrets(next);
+                  } else {
+                    setHighlightFrets([...highlightFrets, f]);
+                  }
+                }}
+              >
+                {f}
+              </th>
             ))}
           </tr>
         </tfoot>
@@ -361,7 +392,7 @@ function App() {
           />
         </div>
 
-				<div />
+        <div />
         <div class="inline">
           <label htmlFor="handed">Left handed:</label>
           <Switcher checked={isLeftHanded} onChange={setIsLeftHanded} />
@@ -374,13 +405,10 @@ function App() {
             onChange={setShowOctaveNumbers}
           />
         </div>
-        
-				<div class="inline">
-          <label htmlFor="chord-builder">Chord Builder Mode:</label>
-          <Switcher
-            checked={highlightMode}
-            onChange={setHighlightMode}
-          />
+
+        <div class="inline">
+          <label htmlFor="chord-builder">Note Focus Mode:</label>
+          <Switcher checked={highlightMode} onChange={setHighlightMode} />
         </div>
       </div>
 

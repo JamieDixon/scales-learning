@@ -24,7 +24,7 @@ table td::before {
   width: 100%;
   left: 0;
   top: 50%;
-  z-index: -1;
+  z-index: 0;
 }
 
 table tr th {
@@ -43,6 +43,7 @@ tfoot tr th {
 }
 
 .note {
+	position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,13 +57,13 @@ tfoot tr th {
   font-size: 0.8em;
 	border-radius: 50%;
 	background: #ffffff;
+	z-index: 1;
 }
 
 .in-key {
   font-size: 1em;
   border: 1px solid #4373cc;
 }
-
 .dia {
   background: #fff;
   border: 1px solid #6495ed;
@@ -166,8 +167,12 @@ tfoot tr th {
   justify-content: center;
 }
 
-.hi-mode.pent, .hi-mode.dia {
+.hi-mode.pent {
 	background-color: #ccc;
+	border: 1px solid #999;
+}
+
+.hi-mode.dia {
 	border: 1px solid #999;
 }
 
@@ -175,4 +180,11 @@ tfoot tr th {
 	background: #2ECC40;
 	border-color: #3D9970;
 	color: #ffffff;
+}
+
+.hi-fret {
+	background: #fce0ee;
+}
+.fret-number {
+	cursor: pointer;
 }
