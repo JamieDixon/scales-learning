@@ -107,7 +107,8 @@ function App() {
     key: 'eadgbe',
     ...openNotes.eadgbe
   });
-
+  const [highlightMode, setHighlightMode] = useState(false);
+  const [highlightNotes, setHighlightNotes] = useState([]);
   const handedFunc = isLeftHanded ? reverse : id;
 
   const stringOpenNotes = instrument.notes;
@@ -184,7 +185,7 @@ function App() {
         <tbody>
           {strings.map((n, i) => (
             <tr key={`string-${i}`}>
-              {n.map((x, i) => {
+              {n.map((x, j) => {
                 const octave = x[x.length - 1];
                 const reactKey = `string-${i}-note-${x}-${octave}`;
                 const noteOptions = x.slice(0, x.length - 1);
@@ -222,15 +223,43 @@ function App() {
 
                 const isRootNote = noteOptions.split('/').includes(keyNote);
 
+                const isHighlighted = highlightNotes.includes(
+                  i.toString() + j.toString()
+                );
+
                 let className = foundInKey ? 'in-key note ' : 'note ';
                 className += foundInKey && !isPentNote ? 'dia ' : '';
                 className += isPentNote ? 'pent ' : '';
                 className += isRootNote ? 'root ' : '';
+                className += isHighlighted ? 'highlight ' : '';
+								className += highlightMode ? 'hi-mode ' : '';
                 return (
                   <td
                     key={reactKey}
                     onClick={() => {
                       playNote(notes, nextNote + octave);
+
+                      if (highlightMode) {
+                        if (isHighlighted) {
+                          const hiIndex = highlightNotes.indexOf(
+                            i.toString() + j.toString()
+                          );
+                          const nextHi = [
+                            ...highlightNotes.slice(0, hiIndex),
+                            ...highlightNotes.slice(
+                              hiIndex + 1,
+                              highlightNotes.length
+                            )
+                          ];
+
+                          setHighlightNotes(nextHi);
+                        } else {
+                          setHighlightNotes([
+                            ...highlightNotes,
+                            i.toString() + j.toString()
+                          ]);
+                        }
+                      }
                     }}
                   >
                     <div className={className}>
@@ -331,6 +360,8 @@ function App() {
             onChange={setFretCount}
           />
         </div>
+
+				<div />
         <div class="inline">
           <label htmlFor="handed">Left handed:</label>
           <Switcher checked={isLeftHanded} onChange={setIsLeftHanded} />
@@ -343,10 +374,18 @@ function App() {
             onChange={setShowOctaveNumbers}
           />
         </div>
+        
+				<div class="inline">
+          <label htmlFor="chord-builder">Chord Builder Mode:</label>
+          <Switcher
+            checked={highlightMode}
+            onChange={setHighlightMode}
+          />
+        </div>
       </div>
 
       <div class="info">
-			<p>Intervals of {modeName.label}</p>
+        <p>Intervals of {modeName.label}</p>
         <ul className="interval-names">
           {modedIntervals
             .map(x => intervalNames[x])

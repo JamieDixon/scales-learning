@@ -146,6 +146,7 @@ tfoot tr th {
   margin: 0;
   margin-right: 0.5em;
   padding-top: 0.3em;
+	width: 10em;
 }
 
 .info {
@@ -163,4 +164,15 @@ tfoot tr th {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.hi-mode.pent, .hi-mode.dia {
+	background-color: #ccc;
+	border: 1px solid #999;
+}
+
+.hi-mode.note.highlight {
+	background: #2ECC40;
+	border-color: #3D9970;
+	color: #ffffff;
 }
