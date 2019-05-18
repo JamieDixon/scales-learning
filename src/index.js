@@ -312,136 +312,139 @@ function App() {
           </tr>
         </tfoot>
       </table>
+      <div class="controls">
+        <div className="options">
+          <div>
+            <label htmlFor="instrument">Instrument:</label>
+            <Select
+              value={{ value: instrument.key, label: instrument.label }}
+              options={Object.entries(openNotes).reduce(
+                (agg, [value, item]) => [...agg, { value, label: item.label }],
+                []
+              )}
+              onChange={({ value }) =>
+                setInstrument({ key: value, ...openNotes[value] })
+              }
+            />
+          </div>
 
-      <div class="options">
-        <div>
-          <label htmlFor="instrument">Instrument:</label>
-          <Select
-            value={{ value: instrument.key, label: instrument.label }}
-            options={Object.entries(openNotes).reduce(
-              (agg, [value, item]) => [...agg, { value, label: item.label }],
-              []
-            )}
-            onChange={({ value }) =>
-              setInstrument({ key: value, ...openNotes[value] })
-            }
-          />
+          <div>
+            <label htmlFor="which-key">Which key would you like to use?</label>
+            <Select
+              value={{ value: keyNote, label: keyNote }}
+              options={[
+                'A',
+                'A#',
+                'B',
+                'C',
+                'C#',
+                'D',
+                'D#',
+                'E',
+                'F',
+                'F#',
+                'G',
+                'G#'
+              ].map(x => ({ value: x, label: x }))}
+              onChange={e => setKeyNote(e.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="which-mode">
+              Which mode would you like to use?
+            </label>{' '}
+            <Select
+              id="which-mode"
+              value={modeName}
+              options={[
+                { value: 'ionian', label: 'Ionian (Major)' },
+                { value: 'dorian', label: 'Dorian' },
+                { value: 'phrygian', label: 'Phrygian' },
+                { value: 'lydian', label: 'Lydian' },
+                { value: 'mixolydian', label: 'Mixolydian' },
+                { value: 'aeolian', label: 'Aeolian (Natural Minor)' }
+              ]}
+              onChange={setModeName}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="which-notes">Which notes do you want to see?</label>
+            <Select
+              value={notesToShow}
+              options={[
+                { value: 'all', label: 'All' },
+                { value: 'diatonic', label: 'Diatonic' },
+                { value: 'pentatonic', label: 'Pentatonic' }
+              ]}
+              onChange={setNotesToShow}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="fretcount">Fret count</label>
+            <Select
+              value={fretCount}
+              options={[
+                { value: 12, label: 12 },
+                { value: 15, label: 15 },
+                { value: 27, label: 27 }
+              ]}
+              onChange={setFretCount}
+            />
+          </div>
+
+          <div />
+          <div class="inline">
+            <label htmlFor="handed">Left handed:</label>
+            <Switcher checked={isLeftHanded} onChange={setIsLeftHanded} />
+          </div>
+
+          <div class="inline">
+            <label htmlFor="handed">Octave numbers:</label>
+            <Switcher
+              checked={showOctaveNumbers}
+              onChange={setShowOctaveNumbers}
+            />
+          </div>
+
+          <div class="inline">
+            <label htmlFor="chord-builder">Note Focus Mode:</label>
+            <Switcher checked={highlightMode} onChange={setHighlightMode} />
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="which-key">Which key would you like to use?</label>
-          <Select
-            value={{ value: keyNote, label: keyNote }}
-            options={[
-              'A',
-              'A#',
-              'B',
-              'C',
-              'C#',
-              'D',
-              'D#',
-              'E',
-              'F',
-              'F#',
-              'G',
-              'G#'
-            ].map(x => ({ value: x, label: x }))}
-            onChange={e => setKeyNote(e.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="which-mode">Which mode would you like to use?</label>{' '}
-          <Select
-            id="which-mode"
-            value={modeName}
-            options={[
-              { value: 'ionian', label: 'Ionian (Major)' },
-              { value: 'dorian', label: 'Dorian' },
-              { value: 'phrygian', label: 'Phrygian' },
-              { value: 'lydian', label: 'Lydian' },
-              { value: 'mixolydian', label: 'Mixolydian' },
-              { value: 'aeolian', label: 'Aeolian (Natural Minor)' }
-            ]}
-            onChange={setModeName}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="which-notes">Which notes do you want to see?</label>
-          <Select
-            value={notesToShow}
-            options={[
-              { value: 'all', label: 'All' },
-              { value: 'diatonic', label: 'Diatonic' },
-              { value: 'pentatonic', label: 'Pentatonic' }
-            ]}
-            onChange={setNotesToShow}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="fretcount">Fret count</label>
-          <Select
-            value={fretCount}
-            options={[
-              { value: 12, label: 12 },
-              { value: 15, label: 15 },
-              { value: 27, label: 27 }
-            ]}
-            onChange={setFretCount}
-          />
-        </div>
-
-        <div />
-        <div class="inline">
-          <label htmlFor="handed">Left handed:</label>
-          <Switcher checked={isLeftHanded} onChange={setIsLeftHanded} />
-        </div>
-
-        <div class="inline">
-          <label htmlFor="handed">Octave numbers:</label>
-          <Switcher
-            checked={showOctaveNumbers}
-            onChange={setShowOctaveNumbers}
-          />
-        </div>
-
-        <div class="inline">
-          <label htmlFor="chord-builder">Note Focus Mode:</label>
-          <Switcher checked={highlightMode} onChange={setHighlightMode} />
-        </div>
-      </div>
-
-      <div class="info">
-        <p>Intervals of {modeName.label}</p>
-        <ul className="interval-names">
-          {modedIntervals
-            .map(x => intervalNames[x])
-            .map(int => (
-              <li>{int}</li>
+        <div class="info">
+          <p>Intervals of {modeName.label}</p>
+          <ul className="interval-names">
+            {modedIntervals
+              .map(x => intervalNames[x])
+              .map(int => (
+                <li>{int}</li>
+              ))}
+          </ul>
+          <p>
+            Diatonic notes in {keyNote} {modeName.label}
+          </p>
+          <ul className="scale-notes">
+            {notesInKey.map(n => (
+              <li className="list-note" key={`dia-notes-${n}`}>
+                {n}
+              </li>
             ))}
-        </ul>
-        <p>
-          Diatonic notes in {keyNote} {modeName.label}
-        </p>
-        <ul className="scale-notes">
-          {notesInKey.map(n => (
-            <li className="list-note" key={`dia-notes-${n}`}>
-              {n}
-            </li>
-          ))}
-        </ul>
+          </ul>
 
-        <p>
-          Pentatonic notes in {keyNote} {modeName.label}
-        </p>
-        <ul className="scale-notes">
-          {pentatonicNotes.map(n => (
-            <li className="list-note" key={`pent-notes-${n}`}>
-              {n}
-            </li>
-          ))}
-        </ul>
+          <p>
+            Pentatonic notes in {keyNote} {modeName.label}
+          </p>
+          <ul className="scale-notes">
+            {pentatonicNotes.map(n => (
+              <li className="list-note" key={`pent-notes-${n}`}>
+                {n}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

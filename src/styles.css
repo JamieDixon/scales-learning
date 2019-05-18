@@ -115,10 +115,13 @@ tfoot tr th {
   padding: 1em;
 }
 
+.controls {
+	display: flex;
+}
+
 .options {
   display: flex;
-  flex-wrap: wrap;
-  float: left;
+  flex-wrap: wrap; 
   width: 40%;
   text-align: left;
   margin-top: 2em;
@@ -151,7 +154,6 @@ tfoot tr th {
 }
 
 .info {
-  float: left;
   text-align: left;
   margin-left: 1em;
 }
