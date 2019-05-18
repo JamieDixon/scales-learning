@@ -5,9 +5,11 @@
 }
 
 table {
+  table-layout: fixed;
   border-collapse: collapse;
   width: 100%;
 }
+
 table td {
   position: relative;
   text-align: center;
@@ -32,7 +34,7 @@ table tr th {
 }
 
 table tr th.string-number {
-  padding-left: 1em;
+  width: 20px;
   border-left: 2px solid #ccc;
 }
 
@@ -43,7 +45,7 @@ tfoot tr th {
 }
 
 .note {
-	position: relative;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,9 +57,9 @@ tfoot tr th {
   width: 2.5em;
   height: 2.5em;
   font-size: 0.8em;
-	border-radius: 50%;
-	background: #ffffff;
-	z-index: 1;
+  border-radius: 50%;
+  background: #ffffff;
+  z-index: 1;
 }
 
 .in-key {
@@ -116,12 +118,12 @@ tfoot tr th {
 }
 
 .controls {
-	display: flex;
+  display: flex;
 }
 
 .options {
   display: flex;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   width: 40%;
   text-align: left;
   margin-top: 2em;
@@ -150,7 +152,7 @@ tfoot tr th {
   margin: 0;
   margin-right: 0.5em;
   padding-top: 0.3em;
-	width: 10em;
+  width: 10em;
 }
 
 .info {
@@ -170,23 +172,23 @@ tfoot tr th {
 }
 
 .hi-mode.pent {
-	background-color: #ccc;
-	border: 1px solid #999;
+  background-color: #ccc;
+  border: 1px solid #999;
 }
 
 .hi-mode.dia {
-	border: 1px solid #999;
+  border: 1px solid #999;
 }
 
 .hi-mode.note.highlight {
-	background: #2ECC40;
-	border-color: #3D9970;
-	color: #ffffff;
+  background: #2ecc40;
+  border-color: #3d9970;
+  color: #ffffff;
 }
 
 .hi-fret {
-	background: #fce0ee;
+  background: #fce0ee;
 }
 .fret-number {
-	cursor: pointer;
+  cursor: pointer;
 }
