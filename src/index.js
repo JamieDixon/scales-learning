@@ -446,6 +446,36 @@ function App() {
           </ul>
         </div>
       </div>
+      <div class="what-do">
+        <h3>What can I do with Fretaculous?</h3>
+        <ul>
+          <li>
+            <strong>Choose an instrument:</strong> Guitar (Standard), Drop D, DADGAD, Bass
+            Guitar, etc
+          </li>
+          <li>
+            <strong>Pick a key</strong> - This will highlight your root note in red, pentatonic
+            notes in blue, and diatonic notes with a blue border.
+          </li>
+          <li><strong>Choose a mode</strong> - Want to practice your A# Dorian? No problem!</li>
+          <li>
+            <strong>Which notes would you like to see?</strong> - Choose between All notes,
+            diatonic, and pentatonic for a simplified view
+          </li>
+          <li><strong>Switch</strong> between 27, 15, and 12 frets for ease of viewing</li>
+					<li><strong>Left handed</strong> - Switch between left and right handed</li>
+          <li><strong>Octave numbers</strong> - turn them on and off as you please</li>
+          <li>
+            <strong>Note Focus Mode</strong> - In this mode, all notes are grayed out until you
+            click on them to highlight. Good for learning to build chords
+          </li>
+          <li>
+            <strong>Fret Focus</strong> - Clicking the bottom fret numbers will highlight that
+            fret. Good for isolating scale patterns
+          </li>
+					<li><strong>Hear the notes</strong> - Clicking notes on the fretboard will play that not at the designated octave</li>
+        </ul>
+      </div>
     </div>
   );
 }

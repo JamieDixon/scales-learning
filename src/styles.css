@@ -192,3 +192,11 @@ tfoot tr th {
 .fret-number {
   cursor: pointer;
 }
+
+.what-do {
+	text-align: left;
+}
+
+.what-do li {
+	margin-bottom: 0.3em;
+}
