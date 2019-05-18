@@ -101,7 +101,7 @@ function App() {
     label: 'Ionian (Major)'
   });
   const [keyNote, setKeyNote] = useState('C');
-  const [isLeftHanded, setIsLeftHanded] = useState(true);
+  const [isLeftHanded, setIsLeftHanded] = useState(false);
   const [showOctaveNumbers, setShowOctaveNumbers] = useState(true);
   const [instrument, setInstrument] = useState({
     key: 'eadgbe',
