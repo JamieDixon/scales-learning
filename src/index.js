@@ -332,9 +332,20 @@ function App() {
             <label htmlFor="which-key">Which key would you like to use?</label>
             <Select
               value={{ value: keyNote, label: keyNote }}
-              options={['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'].map(
-                x => ({ value: x, label: x })
-              )}
+              options={[
+                'A♭',
+                'A',
+                'B♭',
+                'B',
+                'C',
+                'C#',
+                'D',
+                'E♭',
+                'E',
+                'F',
+                'F#',
+                'G'
+              ].map(x => ({ value: x, label: x }))}
               onChange={e => setKeyNote(e.value)}
             />
           </div>
