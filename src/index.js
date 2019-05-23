@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import ReactDOM from 'react-dom';
 import { getNotesForKey, generateIntervals } from './notes';
 import { playNote } from './music';
@@ -90,33 +90,86 @@ const Switcher = ({ onChange, checked }) => (
   />
 );
 
+const saveState = (
+  notesToShow,
+  modeName,
+  keyNote,
+  isLeftHanded,
+  showOctaveNumbers,
+  instrument,
+  highlightMode,
+  highlightNotes,
+  highlightFrets,
+  fretCount
+) => {};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'setNotesToShow':
+      return { ...state, notesToShow: action.payload };
+    case 'setModeName':
+      return { ...state, modeName: action.payload };
+    case 'setKeyNote':
+      return { ...state, keyNote: action.payload };
+    case 'setIsLeftHanded':
+      return { ...state, isLeftHanded: action.payload };
+    case 'setShowOctaveNumbers':
+      return { ...state, showOctaveNumbers: action.payload };
+    case 'setHighlightMode':
+      return { ...state, highlightMode: action.payload };
+    case 'setInstrument':
+      return { ...state, instrument: action.payload };
+    case 'setHighlightNotes':
+      return { ...state, highlightNotes: action.payload };
+    case 'setHighlightFrets':
+      return { ...state, highlightFrets: action.payload };
+    case 'setFretCount':
+      return { ...state, fretCount: action.payload };
+    default:
+      return state;
+  }
+};
+
 function App() {
-  // all || diatonic || pentatonic
-  const [notesToShow, setNotesToShow] = useState({
-    value: 'pentatonic',
-    label: 'Pentatonic'
+  const [state, dispatch] = useReducer(reducer, {
+    notesToShow: {
+      value: 'pentatonic',
+      label: 'pentatonic'
+    },
+    modeName: {
+      value: 'ionian',
+      label: 'Ionian (Major)'
+    },
+    fretCount: {
+      value: 27,
+      label: 27
+    },
+    keyNote: 'C',
+    isLeftHanded: false,
+    showOctaveNumbers: true,
+    highlightMode: false,
+    highlightNotes: [],
+    highlightFrets: [],
+    instrument: {
+      key: 'eadgbe',
+      ...openNotes.eadgbe
+    }
   });
-  const [modeName, setModeName] = useState({
-    value: 'ionian',
-    label: 'Ionian (Major)'
-  });
-  const [keyNote, setKeyNote] = useState('C');
-  const [isLeftHanded, setIsLeftHanded] = useState(false);
-  const [showOctaveNumbers, setShowOctaveNumbers] = useState(true);
-  const [instrument, setInstrument] = useState({
-    key: 'eadgbe',
-    ...openNotes.eadgbe
-  });
-  const [highlightMode, setHighlightMode] = useState(false);
-  const [highlightNotes, setHighlightNotes] = useState([]);
-  const [highlightFrets, setHighlightFrets] = useState([]);
+  const {
+    notesToShow,
+    modeName,
+    keyNote,
+    isLeftHanded,
+    showOctaveNumbers,
+    highlightMode,
+    instrument,
+    highlightNotes,
+    highlightFrets,
+    fretCount
+  } = state;
 
   const handedFunc = isLeftHanded ? reverse : id;
-
   const stringOpenNotes = instrument.notes;
-
-  const [fretCount, setFretCount] = useState({ value: 27, label: 27 });
-
   const mode = modes[modeName.value];
   const modedIntervals = generateIntervals(intervals, mode);
   const notesInKey = getNotesForKey(keyNote, mode, modedIntervals, notes);
@@ -264,12 +317,18 @@ function App() {
                             )
                           ];
 
-                          setHighlightNotes(nextHi);
+                          dispatch({
+                            type: 'setHighlightNotes',
+                            payload: nextHi
+                          });
                         } else {
-                          setHighlightNotes([
-                            ...highlightNotes,
-                            i.toString() + j.toString()
-                          ]);
+                          dispatch({
+                            type: 'setHighlightNotes',
+                            payload: [
+                              ...highlightNotes,
+                              i.toString() + j.toString()
+                            ]
+                          });
                         }
                       }
                     }}
@@ -300,9 +359,12 @@ function App() {
                       ...highlightFrets.slice(index + 1, highlightFrets.length)
                     ];
 
-                    setHighlightFrets(next);
+                    dispatch({ type: 'setHighlightFrets', payload: next });
                   } else {
-                    setHighlightFrets([...highlightFrets, f]);
+                    dispatch({
+                      type: 'setHighlightFrets',
+                      payload: [...highlightFrets, f]
+                    });
                   }
                 }}
               >
@@ -323,7 +385,10 @@ function App() {
                 []
               )}
               onChange={({ value }) =>
-                setInstrument({ key: value, ...openNotes[value] })
+                dispatch({
+                  type: 'setInstrument',
+                  payload: { key: value, ...openNotes[value] }
+                })
               }
             />
           </div>
@@ -346,7 +411,7 @@ function App() {
                 'F#',
                 'G'
               ].map(x => ({ value: x, label: x }))}
-              onChange={e => setKeyNote(e.value)}
+              onChange={e => dispatch({ type: 'setKeyNote', payload: e.value })}
             />
           </div>
           <div>
@@ -364,7 +429,7 @@ function App() {
                 { value: 'mixolydian', label: 'Mixolydian' },
                 { value: 'aeolian', label: 'Aeolian (Natural Minor)' }
               ]}
-              onChange={setModeName}
+              onChange={payload => dispatch({ type: 'setModeName', payload })}
             />
           </div>
 
@@ -377,7 +442,9 @@ function App() {
                 { value: 'diatonic', label: 'Diatonic' },
                 { value: 'pentatonic', label: 'Pentatonic' }
               ]}
-              onChange={setNotesToShow}
+              onChange={payload =>
+                dispatch({ type: 'setNotesToShow', payload })
+              }
             />
           </div>
 
@@ -390,27 +457,39 @@ function App() {
                 { value: 15, label: 15 },
                 { value: 27, label: 27 }
               ]}
-              onChange={setFretCount}
+              onChange={payload => dispatch({ type: 'setFretCount', payload })}
             />
           </div>
 
           <div />
           <div class="inline">
             <label htmlFor="handed">Left handed:</label>
-            <Switcher checked={isLeftHanded} onChange={setIsLeftHanded} />
+            <Switcher
+              checked={isLeftHanded}
+              onChange={payload =>
+                dispatch({ type: 'setIsLeftHanded', payload })
+              }
+            />
           </div>
 
           <div class="inline">
             <label htmlFor="handed">Octave numbers:</label>
             <Switcher
               checked={showOctaveNumbers}
-              onChange={setShowOctaveNumbers}
+              onChange={payload =>
+                dispatch({ type: 'setShowOctaveNumbers', payload })
+              }
             />
           </div>
 
           <div class="inline">
             <label htmlFor="chord-builder">Note Focus Mode:</label>
-            <Switcher checked={highlightMode} onChange={setHighlightMode} />
+            <Switcher
+              checked={highlightMode}
+              onChange={payload =>
+                dispatch({ type: 'setHighlightMode', payload })
+              }
+            />
           </div>
         </div>
 
