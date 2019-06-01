@@ -90,6 +90,19 @@ const Switcher = ({ onChange, checked }) => (
   />
 );
 
+const Footer = () => (
+  <div>
+    Developed by{' '}
+    <a
+      target="_blank"
+      rel="noopener noreferrer"
+      href="https://twitter.com/jamiedixon"
+    >
+      @jamiedixon
+    </a>
+  </div>
+);
+
 const saveState = (
   notesToShow,
   modeName,
@@ -570,6 +583,7 @@ function App() {
           </li>
         </ul>
       </div>
+      <Footer />
     </div>
   );
 }
