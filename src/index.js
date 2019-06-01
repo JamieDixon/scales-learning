@@ -579,7 +579,7 @@ function App() {
           </li>
           <li>
             <strong>Hear the notes</strong> - Clicking notes on the fretboard
-            will play that not at the designated octave
+            will play that note at the designated octave
           </li>
         </ul>
       </div>
