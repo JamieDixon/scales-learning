@@ -13,7 +13,8 @@ const modes = {
   phrygian: 2,
   lydian: 3,
   mixolydian: 4,
-  aeolian: 5
+  aeolian: 5,
+  locrian: 6
 };
 
 const pentatonic = {
@@ -22,7 +23,8 @@ const pentatonic = {
   phrygian: [1, 2, 4, 6, 7],
   lydian: [1, 2, 3, 4, 6],
   mixolydian: [1, 2, 3, 5, 7],
-  aeolian: [1, 3, 4, 5, 7]
+  aeolian: [1, 3, 4, 5, 7],
+  locrian: [1, 3, 4, 5, 7]
 };
 
 const openNotes = {
@@ -440,7 +442,8 @@ function App() {
                 { value: 'phrygian', label: 'Phrygian' },
                 { value: 'lydian', label: 'Lydian' },
                 { value: 'mixolydian', label: 'Mixolydian' },
-                { value: 'aeolian', label: 'Aeolian (Natural Minor)' }
+                { value: 'aeolian', label: 'Aeolian (Natural Minor)' },
+                { value: 'locrian', label: 'Locrian' }
               ]}
               onChange={payload => dispatch({ type: 'setModeName', payload })}
             />
