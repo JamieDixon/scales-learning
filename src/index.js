@@ -140,16 +140,42 @@ const reducer = (state, action) => {
       return { ...state, highlightFrets: action.payload };
     case 'setFretCount':
       return { ...state, fretCount: action.payload };
+    case 'setShowIntervals':
+      return { ...state, showIntervals: action.payload };
     default:
       return state;
   }
+};
+
+const intervalShortNames = {
+  0: 'R',
+  1: 'm2',
+  2: 'M2',
+  3: 'm3',
+  4: 'M3',
+  5: 'P4',
+  6: 'TT',
+  7: 'P5',
+  8: 'm6',
+  9: 'M6',
+  10: 'm7',
+  11: 'M7'
+};
+
+const calcInterval = (nextNote, orderedChromatic) => {
+  const noteIndex = orderedChromatic.findIndex(x => {
+    const [left, right] = x.split('/');
+    return left === nextNote || right === nextNote;
+  });
+
+  return intervalShortNames[noteIndex];
 };
 
 function App() {
   const [state, dispatch] = useReducer(reducer, {
     notesToShow: {
       value: 'pentatonic',
-      label: 'pentatonic'
+      label: 'Pentatonic'
     },
     modeName: {
       value: 'ionian',
@@ -159,6 +185,7 @@ function App() {
       value: 27,
       label: 27
     },
+    showIntervals: false,
     keyNote: 'C',
     isLeftHanded: false,
     showOctaveNumbers: true,
@@ -180,7 +207,8 @@ function App() {
     instrument,
     highlightNotes,
     highlightFrets,
-    fretCount
+    fretCount,
+    showIntervals
   } = state;
 
   const handedFunc = isLeftHanded ? reverse : id;
@@ -197,6 +225,16 @@ function App() {
       .fill('')
       .map((_, i) => i)
   );
+
+  const startIndex = notes.findIndex(n => {
+    const s = n.split('/');
+    return s.includes(keyNote);
+  });
+
+  const orderedChromatic = [
+    ...notes.slice(startIndex, notes.length),
+    ...notes.slice(0, startIndex)
+  ];
 
   const strings = reverse(
     stringOpenNotes.map(st => {
@@ -349,8 +387,10 @@ function App() {
                     }}
                   >
                     <div className={className}>
-                      {nextNote}
-                      {showOctaveNumbers ? octave : ''}
+                      {!showIntervals && nextNote}
+                      {!showIntervals && showOctaveNumbers ? octave : ''}
+                      {showIntervals &&
+                        calcInterval(nextNote, orderedChromatic)}
                     </div>
                   </td>
                 );
@@ -484,6 +524,16 @@ function App() {
               checked={isLeftHanded}
               onChange={payload =>
                 dispatch({ type: 'setIsLeftHanded', payload })
+              }
+            />
+          </div>
+
+          <div class="inline">
+            <label htmlFor="handed">Show Note Intervals:</label>
+            <Switcher
+              checked={showIntervals}
+              onChange={payload =>
+                dispatch({ type: 'setShowIntervals', payload })
               }
             />
           </div>
