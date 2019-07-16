@@ -1,3 +1,5 @@
+import { ordinalSuffix } from './suffix';
+
 export const generateIntervals = (majorIntervals, mode) => {
   const rightIntervals = majorIntervals.slice(0, mode);
   const leftIntervals = majorIntervals.slice(mode, majorIntervals.length);
@@ -42,4 +44,32 @@ export const getNotesForKey = (key, mode, intervals, notes) => {
   );
 
   return keyNotes;
+};
+
+// keysMajorScale - The given keys major scale
+// notesInKey - the nodes in the current modal scale
+export const calcDifferencesBetweenScales = (keysMajorScale, notesInKey) => {
+  return keysMajorScale.reduce((agg, next, i) => {
+    const scaleModeNote = notesInKey[i];
+
+    if (next === scaleModeNote) {
+      return agg;
+    }
+
+    let label = '';
+
+    if (scaleModeNote.includes('#') || next.includes('♭')) {
+      label = 'raised';
+    }
+
+    if (scaleModeNote.includes('♭') || next.includes('#')) {
+      label = 'lowered';
+    }
+
+    if (i === keysMajorScale.length - 1 && i > 0) {
+      label = 'and ' + label;
+    }
+
+    return [...agg, `${label} ${ordinalSuffix(i + 1)} (${scaleModeNote})`];
+  }, []);
 };

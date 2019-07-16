@@ -1,9 +1,14 @@
 import React, { useReducer } from 'react';
 import ReactDOM from 'react-dom';
-import { getNotesForKey, generateIntervals } from './notes';
+import {
+  getNotesForKey,
+  generateIntervals,
+  calcDifferencesBetweenScales
+} from './notes';
 import { playNote } from './music';
 import Switch from 'react-switch';
 import Select from 'react-select';
+import { ordinalSuffix } from './suffix';
 import './styles.css';
 
 // Interval offsets fron ionian major mode
@@ -278,6 +283,21 @@ function App() {
 
       return handedFunc(orderedNotes);
     })
+  );
+
+  const modeDegree = Math.abs(modes[modeName.value]);
+
+  const sliceParams =
+    modeDegree > 1 ? [-modeDegree, -modeDegree + 1] : [-modeDegree];
+
+  const [enharmonicMajor] = notesInKey.slice(...sliceParams);
+
+  // The notes in the major scale for this key
+  const keysMajorScale = getNotesForKey(keyNote, null, intervals, notes);
+
+  const differencesBetweenScales = calcDifferencesBetweenScales(
+    keysMajorScale,
+    notesInKey
   );
 
   return (
@@ -589,6 +609,43 @@ function App() {
               </li>
             ))}
           </ul>
+          {mode > 0 && (
+            <>
+              <p>
+                <strong>
+                  {keyNote} {modeName.label}
+                </strong>{' '}
+                is the {ordinalSuffix(mode + 1)} degree of the{' '}
+                <strong>{enharmonicMajor} Major</strong> scale and contains the
+                same notes.
+              </p>
+              <p>
+                This means you can play the{' '}
+                <strong>{enharmonicMajor} Major</strong> scale over the top of a
+                chord progression in{' '}
+                <strong>
+                  {keyNote} {modeName.label}
+                </strong>{' '}
+                utilising <strong>{keyNote} as the tonic</strong>.
+              </p>
+              <p>
+                Additionally,{' '}
+                <strong>
+                  {keyNote} {modeName.label}
+                </strong>{' '}
+                differs from its Major counterpart (
+                <strong>{keyNote} Ionian (Major)</strong>) because of its{' '}
+                <strong>{differencesBetweenScales.join(', ')}</strong>.
+              </p>
+              <p>
+                This tells us that in order to get the{' '}
+                <strong>{modeName.label} sound</strong>, we need to pay
+                particular attention to the{' '}
+                <strong>{differencesBetweenScales.join(', ')}</strong> along
+                with our focus on <strong>{keyNote} as the tonic</strong>.
+              </p>
+            </>
+          )}
         </div>
       </div>
       <div class="what-do">
