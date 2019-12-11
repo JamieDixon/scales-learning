@@ -1,11 +1,5 @@
 import { ordinalSuffix } from './suffix';
 
-export const generateIntervals = (majorIntervals, mode) => {
-  const rightIntervals = majorIntervals.slice(0, mode);
-  const leftIntervals = majorIntervals.slice(mode, majorIntervals.length);
-  return [...leftIntervals, ...rightIntervals];
-};
-
 export const getNotesForKey = (key, mode, intervals, notes) => {
   const keyIndex = notes.findIndex(note => {
     const [a, b] = note.split('/');

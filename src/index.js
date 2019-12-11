@@ -1,25 +1,25 @@
 import React, { useReducer } from 'react';
 import ReactDOM from 'react-dom';
-import {
-  getNotesForKey,
-  generateIntervals,
-  calcDifferencesBetweenScales
-} from './notes';
+import { getNotesForKey, calcDifferencesBetweenScales } from './notes';
 import { playNote } from './music';
 import Switch from 'react-switch';
 import Select from 'react-select';
 import { ordinalSuffix } from './suffix';
 import './styles.css';
 
-// Interval offsets fron ionian major mode
+const T = 1;
+const S = 0.5;
+
 const modes = {
-  ionian: 0,
-  dorian: 1,
-  phrygian: 2,
-  lydian: 3,
-  mixolydian: 4,
-  aeolian: 5,
-  locrian: 6
+  ionian: [T, T, S, T, T, T, S],
+  dorian: [T, S, T, T, T, S, T],
+  phrygian: [S, T, T, T, S, T, T],
+  lydian: [T, T, T, S, T, T, S],
+  mixolydian: [T, T, S, T, T, S, T],
+  aeolian: [T, S, T, T, S, T, T],
+  locrian: [S, T, T, S, T, T, T],
+  melodicminor: [T, S, T, T, T, T, S],
+  harmonicminor: [T, S, T, T, S, T + S, S]
 };
 
 const pentatonic = {
@@ -29,7 +29,9 @@ const pentatonic = {
   lydian: [1, 2, 3, 4, 6],
   mixolydian: [1, 2, 3, 5, 7],
   aeolian: [1, 3, 4, 5, 7],
-  locrian: [1, 3, 4, 5, 7]
+  locrian: [1, 3, 4, 5, 7],
+  melodicminor: [1, 3, 4, 5, 7],
+  harmonicminor: [1, 3, 4, 5, 7]
 };
 
 const openNotes = {
@@ -53,7 +55,8 @@ const openNotes = {
 
 const intervalNames = {
   '1': 'Tone',
-  '0.5': 'Semitone'
+  '0.5': 'Semitone',
+  '1.5': 'Tone + Semitone'
 };
 
 const intervals = [1, 1, 0.5, 1, 1, 1, 0.5];
@@ -109,19 +112,6 @@ const Footer = () => (
     </a>
   </div>
 );
-
-const saveState = (
-  notesToShow,
-  modeName,
-  keyNote,
-  isLeftHanded,
-  showOctaveNumbers,
-  instrument,
-  highlightMode,
-  highlightNotes,
-  highlightFrets,
-  fretCount
-) => {};
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -218,8 +208,10 @@ function App() {
 
   const handedFunc = isLeftHanded ? reverse : id;
   const stringOpenNotes = instrument.notes;
-  const mode = modes[modeName.value];
-  const modedIntervals = generateIntervals(intervals, mode);
+  const mode = Object.keys(modes).indexOf(modeName.value);
+  // const modedIntervals = generateIntervals(intervals, mode);
+  const modedIntervals = modes[modeName.value];
+
   const notesInKey = getNotesForKey(keyNote, mode, modedIntervals, notes);
   const pentatonicNotes = pentatonic[modeName.value].map(
     n => notesInKey[n - 1]
@@ -285,7 +277,7 @@ function App() {
     })
   );
 
-  const modeDegree = Math.abs(modes[modeName.value]);
+  const modeDegree = Math.abs(Object.keys(modes).indexOf(modeName.value));
 
   const sliceParams =
     modeDegree > 1 ? [-modeDegree, -modeDegree + 1] : [-modeDegree];
@@ -415,7 +407,7 @@ function App() {
                   </td>
                 );
               })}
-              <th class="string-number">{i + 1}</th>
+              <th className="string-number">{i + 1}</th>
             </tr>
           ))}
         </tbody>
@@ -449,7 +441,7 @@ function App() {
           </tr>
         </tfoot>
       </table>
-      <div class="controls">
+      <div className="controls">
         <div className="options">
           <div>
             <label htmlFor="instrument">Instrument:</label>
@@ -491,7 +483,7 @@ function App() {
           </div>
           <div>
             <label htmlFor="which-mode">
-              Which mode would you like to use?
+              Which scale would you like to use?
             </label>{' '}
             <Select
               id="which-mode"
@@ -503,7 +495,9 @@ function App() {
                 { value: 'lydian', label: 'Lydian' },
                 { value: 'mixolydian', label: 'Mixolydian' },
                 { value: 'aeolian', label: 'Aeolian (Natural Minor)' },
-                { value: 'locrian', label: 'Locrian' }
+                { value: 'locrian', label: 'Locrian' },
+                { value: 'melodicminor', label: 'Melodic Minor' },
+                { value: 'harmonicminor', label: 'Harmonic Minor' }
               ]}
               onChange={payload => dispatch({ type: 'setModeName', payload })}
             />
@@ -538,7 +532,7 @@ function App() {
           </div>
 
           <div />
-          <div class="inline">
+          <div className="inline">
             <label htmlFor="handed">Left handed:</label>
             <Switcher
               checked={isLeftHanded}
@@ -548,7 +542,7 @@ function App() {
             />
           </div>
 
-          <div class="inline">
+          <div className="inline">
             <label htmlFor="handed">Show Note Intervals:</label>
             <Switcher
               checked={showIntervals}
@@ -558,7 +552,7 @@ function App() {
             />
           </div>
 
-          <div class="inline">
+          <div className="inline">
             <label htmlFor="handed">Octave numbers:</label>
             <Switcher
               checked={showOctaveNumbers}
@@ -568,7 +562,7 @@ function App() {
             />
           </div>
 
-          <div class="inline">
+          <div className="inline">
             <label htmlFor="chord-builder">Note Focus Mode:</label>
             <Switcher
               checked={highlightMode}
@@ -579,7 +573,7 @@ function App() {
           </div>
         </div>
 
-        <div class="info">
+        <div className="info">
           <p>Intervals of {modeName.label}</p>
           <ul className="interval-names">
             {modedIntervals
@@ -609,7 +603,7 @@ function App() {
               </li>
             ))}
           </ul>
-          {mode > 0 && (
+          {mode > 0 && mode < 7 && (
             <>
               <p>
                 <strong>
@@ -648,7 +642,7 @@ function App() {
           )}
         </div>
       </div>
-      <div class="what-do">
+      <div className="what-do">
         <h3>What can I do with Fretaculous?</h3>
         <ul>
           <li>
