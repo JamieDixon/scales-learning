@@ -578,8 +578,8 @@ function App() {
           <ul className="interval-names">
             {modedIntervals
               .map(x => intervalNames[x])
-              .map(int => (
-                <li>{int}</li>
+              .map((int, i) => (
+                <li key={`${int}-${i}`}>{int}</li>
               ))}
           </ul>
           <p>
